@@ -2098,6 +2098,66 @@ function refreshAll() {
   updateCoinDisplay();
   buildHeatmap();
   calculatePrediction();
+  updateSummaryStatBar();
+}
+
+const MOTIVATIONAL_QUOTES = [
+  '"Consistency is what transforms average into excellence."',
+  '"Every dog has a day. Work until yours arrives!"',
+  '"Small daily improvements over time lead to stunning results."',
+  '"Discipline is choosing between what you want now and what you want most."',
+  '"Don\'t stop until you\'re proud."'
+];
+
+function updateSummaryStatBar() {
+  const todayProgressEl = $('#summary-today-progress');
+  const currentStreakEl = $('#summary-current-streak');
+  const completionPctEl = $('#summary-completion-pct');
+  const quoteEl = $('#summary-daily-quote');
+
+  const todayIndex = new Date().getDate() - 1;
+  let doneToday = 0;
+  let totalHabits = habits ? habits.length : 0;
+
+  if (habits) {
+    habits.forEach(h => {
+      if (h.checks && h.checks[todayIndex]) doneToday++;
+    });
+  }
+
+  if (todayProgressEl) todayProgressEl.textContent = `${doneToday} / ${totalHabits} Done`;
+
+  let maxStreak = 0;
+  if (typeof calculateStreaks === 'function') {
+    const streaksData = calculateStreaks();
+    if (Array.isArray(streaksData)) {
+      streaksData.forEach(s => {
+        if (s.currentStreak > maxStreak) maxStreak = s.currentStreak;
+      });
+    }
+  }
+  if (currentStreakEl) currentStreakEl.textContent = `${maxStreak} Days`;
+
+  let totalPossible = 0;
+  let totalChecked = 0;
+  const daysInMonth = getDaysInMonth(STATE.currentMonth, STATE.currentYear);
+  if (habits) {
+    habits.forEach(h => {
+      totalPossible += daysInMonth;
+      if (h.checks) {
+        Object.keys(h.checks).forEach(k => {
+          if (h.checks[k]) totalChecked++;
+        });
+      }
+    });
+  }
+  const overallPct = totalPossible > 0 ? Math.round((totalChecked / totalPossible) * 100) : 0;
+  if (completionPctEl) completionPctEl.textContent = `${overallPct}%`;
+
+  if (quoteEl) {
+    const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+    quoteEl.textContent = MOTIVATIONAL_QUOTES[dayOfYear % MOTIVATIONAL_QUOTES.length];
+  }
 }
 
 /* ─────────────────────────────────────────────
