@@ -1574,7 +1574,8 @@ function calculatePrediction() {
 function openModal(overlayId) {
   const overlay = document.getElementById(overlayId);
   if (!overlay) return;
-  overlay.style.display = 'flex';
+  overlay.removeAttribute('hidden');
+  overlay.style.setProperty('display', 'flex', 'important');
   requestAnimationFrame(() => overlay.classList.add('visible'));
 }
 
@@ -1582,11 +1583,12 @@ function closeModal(overlayId) {
   const overlay = document.getElementById(overlayId);
   if (!overlay) return;
   overlay.classList.remove('visible');
-  setTimeout(() => { overlay.style.display = 'none'; }, 250);
+  overlay.setAttribute('hidden', 'true');
+  overlay.style.setProperty('display', 'none', 'important');
 }
 
 function closeAllModals() {
-  ['habit-modal-overlay', 'reward-modal-overlay', 'notes-modal-overlay'].forEach(id => {
+  ['habit-modal-overlay', 'reward-modal-overlay', 'notes-modal-overlay', 'reflection-modal-overlay'].forEach(id => {
     closeModal(id);
   });
 }
@@ -1784,20 +1786,23 @@ function bindEvents() {
   const refCancel = $('#reflection-modal-cancel');
   if (refCancel) refCancel.addEventListener('click', () => closeModal('reflection-modal-overlay'));
 
+  const refOverlay = $('#reflection-modal-overlay');
+  if (refOverlay) refOverlay.addEventListener('click', e => {
+    if (e.target === refOverlay) closeModal('reflection-modal-overlay');
+  });
+
   const refSave = $('#reflection-modal-save');
   if (refSave) refSave.addEventListener('click', () => saveReflection());
 
   const moodSel = $('#mood-selector');
   if (moodSel) {
     moodSel.addEventListener('click', e => {
-      const btn = e.target.closest('.mood-btn');
+      const btn = e.target.closest('.mood-card-exec, .mood-card, .mood-btn');
       if (!btn) return;
-      moodSel.querySelectorAll('.mood-btn').forEach(b => {
-        b.style.borderColor = 'var(--border-color)';
-        b.style.background = 'transparent';
+      moodSel.querySelectorAll('.mood-card-exec, .mood-card, .mood-btn').forEach(b => {
+        b.classList.remove('active', 'selected');
       });
-      btn.style.borderColor = 'var(--accent)';
-      btn.style.background = 'rgba(99, 102, 241, 0.1)';
+      btn.classList.add('active', 'selected');
       moodSel.dataset.selectedMood = btn.dataset.mood;
     });
   }
