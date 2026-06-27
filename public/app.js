@@ -950,7 +950,7 @@ function updateTopHabits() {
     const div = document.createElement('div');
     div.className = 'top-habit-item';
     div.innerHTML = `
-      <span class="rank">#${i + 1}</span>
+      <span class="rank">${i + 1}.</span>
       <span class="top-name">${item.name}</span>
       <div class="top-bar-container">
         <div class="top-bar-fill" style="width:${item.pct}%"></div>
@@ -986,15 +986,15 @@ function updateDailyStats() {
   const statsEl = $('#daily-stats');
   if (statsEl) {
     statsEl.innerHTML = `
-      <div class="stat-box"><span class="stat-value">${dailyGoal}</span><span class="stat-label">Daily Goal</span></div>
-      <div class="stat-box"><span class="stat-value">${avgComplete}</span><span class="stat-label">Avg Complete</span></div>
-      <div class="stat-box"><span class="stat-value">${avgIncomplete}</span><span class="stat-label">Avg Incomplete</span></div>
+      <div class="stat-box"><span class="stat-label">Daily Goal:</span> <span class="stat-value">${dailyGoal}</span></div>
+      <div class="stat-box"><span class="stat-label">Avg Complete:</span> <span class="stat-value">${avgComplete}</span></div>
+      <div class="stat-box"><span class="stat-label">Avg Incomplete:</span> <span class="stat-value">${avgIncomplete}</span></div>
     `;
   }
 
   const weeklyEl = $('#weekly-progress-stats');
   if (weeklyEl) {
-    weeklyEl.innerHTML = `<span class="weekly-pct">${weeklyPct}%</span> <span class="weekly-label">Weekly Progress</span>`;
+    weeklyEl.innerHTML = `<div class="stat-box"><span class="stat-label">Weekly Progress:</span> <span class="stat-value">${weeklyPct}%</span></div>`;
   }
 }
 
