@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const User = require('./models/User');
 const HabitData = require('./models/HabitData');
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://app1:Tv8ut0MUHwP52bJY@cluster0.5zp4y4m.mongodb.net/habitflow?retryWrites=true&w=majority';
 
 const asmHabits = [
   { name: '🌅 Wake up at 7:00 AM', goal: 25, difficulty: 'easy' },
@@ -13,7 +13,9 @@ const asmHabits = [
   { name: '📚 SSC Class / Mock Test', goal: 22, difficulty: 'hard' },
   { name: '🏊 Gym / Swimming (5:00-7:00 PM)', goal: 20, difficulty: 'hard' },
   { name: '📝 SSC Questions / Revision', goal: 22, difficulty: 'medium' },
-  { name: '💻 Cybersecurity Learning (9:30-10:00 PM)', goal: 20, difficulty: 'medium' },
+  { name: '💻 Cybersecurity Learning', goal: 20, difficulty: 'medium' },
+  { name: '💧 Drink 3L Water', goal: 28, difficulty: 'easy' },
+  { name: '🧘‍♂️ Meditate for 15 minutes', goal: 25, difficulty: 'medium' },
   { name: '😴 Sleep by 10:00 PM', goal: 22, difficulty: 'medium' }
 ];
 
@@ -44,12 +46,13 @@ async function seed() {
         displayName: 'AsM',
         passwordHash: hash,
         rewards: asmRewards,
-        coins: 50
+        coins: 100
       });
       await user.save();
       console.log('Created new user for AsM (agnives46@gmail.com)');
     } else {
       user.rewards = asmRewards;
+      user.coins = 100;
       await user.save();
       console.log('Updated existing user for AsM');
     }
@@ -58,25 +61,28 @@ async function seed() {
     const currentYear = new Date().getFullYear();
 
     let habitData = await HabitData.findOne({ userId: user._id, month: currentMonth, year: currentYear });
+    const formattedHabits = asmHabits.map((h, idx) => ({
+      id: 'asm_h_' + idx,
+      name: h.name,
+      goal: h.goal,
+      difficulty: h.difficulty,
+      checks: (habitData && habitData.habits && habitData.habits[idx]) ? habitData.habits[idx].checks : {}
+    }));
+
     if (!habitData) {
-      const formattedHabits = asmHabits.map((h, idx) => ({
-        id: 'asm_h_' + idx,
-        name: h.name,
-        goal: h.goal,
-        difficulty: h.difficulty,
-        checks: {}
-      }));
       habitData = new HabitData({
         userId: user._id,
         month: currentMonth,
         year: currentYear,
         habits: formattedHabits
       });
-      await habitData.save();
-      console.log('Pre-loaded AsM daily routine habits');
+    } else {
+      habitData.habits = formattedHabits;
     }
+    await habitData.save();
+    console.log('Pre-loaded AsM daily routine habits');
 
-    console.log('✅ AsM profile successfully configured!');
+    console.log('✅ AsM profile successfully seeded with full schedule, 3L water, meditation & Nyx roadmap!');
     process.exit(0);
   } catch (err) {
     console.error('Seed error:', err);
