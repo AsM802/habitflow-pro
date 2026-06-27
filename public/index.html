@@ -26,7 +26,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=7.0">
+  <link rel="stylesheet" href="style.css?v=8.0">
 </head>
 
 <body>
@@ -443,16 +443,19 @@
 
   <!-- Weekly Reflection Modal -->
   <div class="modal-overlay" id="reflection-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="reflection-modal-title" hidden>
-    <div class="modal" id="reflection-modal">
+    <div class="modal reflection-modal-card" id="reflection-modal">
       <div class="modal-header header-purple">
-        <h2 id="reflection-modal-title">📝 Weekly Check-in</h2>
+        <h2 id="reflection-modal-title">🌟 Weekly Progress Reflection</h2>
         <button class="btn-icon modal-close" id="reflection-modal-close" aria-label="Close reflection modal">✕</button>
       </div>
       <div class="modal-body">
-        <p class="reflection-intro">Take 60 seconds to review your week and claim your weekly reward bonus!</p>
+        <div class="reflection-banner">
+          <span>🏆 Claim Weekly Check-in Bonus (+10 🪙)</span>
+        </div>
         
+        <!-- Question 1: Mood -->
         <div class="form-group">
-          <label>How was your week overall?</label>
+          <label>1. How was your week overall?</label>
           <div class="mood-grid" id="mood-selector">
             <button type="button" class="mood-card" data-mood="🔥">
               <span class="mood-emoji">🔥</span>
@@ -473,24 +476,26 @@
           </div>
         </div>
 
+        <!-- Question 2: Task Completion Status -->
         <div class="form-group">
-          <label for="reflection-task-status">Did you complete your daily habits as planned?</label>
-          <select id="reflection-task-status">
-            <option value="all">🎉 Completed 100% of my goals</option>
-            <option value="most" selected>👍 Completed most of my goals</option>
-            <option value="some">💪 Hit a few, resetting for next week</option>
-            <option value="missed">🎯 Missed most, recommitting now</option>
+          <label for="reflection-task-status">2. Did you finish your daily tasks as planned?</label>
+          <select id="reflection-task-status" class="styled-select">
+            <option value="all">🎉 Completed 100% of my daily tasks</option>
+            <option value="most" selected>👍 Completed most of my tasks</option>
+            <option value="some">💪 Finished a few, resetting focus for next week</option>
+            <option value="missed">🎯 Missed most, recommitting to my schedule</option>
           </select>
         </div>
 
+        <!-- Question 3: Notes / Reflection -->
         <div class="form-group">
-          <label for="reflection-notes">Biggest Win / Lessons Learned:</label>
-          <textarea id="reflection-notes" placeholder="e.g., Stayed consistent with morning study sessions!" rows="3"></textarea>
+          <label for="reflection-notes">3. Biggest win or notes for next week:</label>
+          <textarea id="reflection-notes" placeholder="e.g. Consistently completed morning study sessions and stayed focused!" rows="3"></textarea>
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" id="reflection-modal-cancel">Skip</button>
-        <button class="btn btn-primary" id="reflection-modal-save">Submit & Claim +10 🪙</button>
+        <button class="btn btn-primary btn-claim" id="reflection-modal-save">Submit & Claim +10 🪙</button>
       </div>
     </div>
   </div>
