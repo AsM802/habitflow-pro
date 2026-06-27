@@ -16,7 +16,7 @@ app.use(cookieParser());
 app.use(cors());
 
 // Connect MongoDB with caching for serverless environments
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/habitflow';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://app1:Tv8ut0MUHwP52bJY@cluster0.5zp4y4m.mongodb.net/habitflow?retryWrites=true&w=majority';
 let isConnected = false;
 
 async function connectDB() {
