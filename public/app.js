@@ -551,10 +551,15 @@ function buildGrid() {
       const todayNumCell = document.querySelector(`.day-number[data-day="${now.getDate() - 1}"]`);
       const gridWrapper = document.querySelector('.habit-grid-wrapper');
       if (todayNumCell && gridWrapper) {
-        gridWrapper.scrollLeft = Math.max(0, todayNumCell.offsetLeft - 260);
+        const cellLeft = todayNumCell.offsetLeft;
+        const wrapperWidth = gridWrapper.clientWidth;
+        gridWrapper.scrollTo({
+          left: Math.max(0, cellLeft - (wrapperWidth / 2) + 20),
+          behavior: 'smooth'
+        });
       }
     }
-  }, 100);
+  }, 150);
 }
 
 /* ─────────────────────────────────────────────
