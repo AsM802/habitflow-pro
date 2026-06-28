@@ -22,6 +22,7 @@ router.get('/data', async (req, res) => {
       notes: habitData ? habitData.notes : {},
       settings: {
         coins: user.coins || 0,
+        medals: user.medals || { bronze: 0, silver: 0, gold: 0, honor: 0 },
         darkMode: user.darkMode || false,
         soundEnabled: user.soundEnabled !== false,
         achievements: user.achievements || {}
@@ -52,6 +53,7 @@ router.post('/save', async (req, res) => {
     const updateObj = {};
     if (settings) {
       if (settings.coins !== undefined) updateObj.coins = settings.coins;
+      if (settings.medals !== undefined) updateObj.medals = settings.medals;
       if (settings.darkMode !== undefined) updateObj.darkMode = settings.darkMode;
       if (settings.soundEnabled !== undefined) updateObj.soundEnabled = settings.soundEnabled;
       if (settings.achievements !== undefined) updateObj.achievements = settings.achievements;

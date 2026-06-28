@@ -6,6 +6,12 @@ const userSchema = new mongoose.Schema({
   displayName: { type: String, trim: true },
   passwordHash: { type: String, required: true },
   coins: { type: Number, default: 0 },
+  medals: {
+    bronze: { type: Number, default: 0 },
+    silver: { type: Number, default: 0 },
+    gold: { type: Number, default: 0 },
+    honor: { type: Number, default: 0 }
+  },
   darkMode: { type: Boolean, default: false },
   soundEnabled: { type: Boolean, default: true },
   achievements: { type: Object, default: {} },
@@ -13,7 +19,13 @@ const userSchema = new mongoose.Schema({
     id: String, 
     name: String, 
     emoji: String, 
-    cost: Number, 
+    cost: Number,
+    requiredMedals: {
+      bronze: { type: Number, default: 0 },
+      silver: { type: Number, default: 0 },
+      gold: { type: Number, default: 0 },
+      honor: { type: Number, default: 0 }
+    },
     redeemed: { type: Boolean, default: false }, 
     redeemedDate: Date 
   }],

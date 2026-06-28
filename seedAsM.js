@@ -20,15 +20,15 @@ const asmHabits = [
 ];
 
 const asmRewards = [
-  { id: 'nyx_1', name: '🔥 FuelX Pro / BoosterPlug', emoji: '⚙️', cost: 150, redeemed: false },
-  { id: 'nyx_2', name: '🔥 66BHP Teflon Brake Hose', emoji: '🏍️', cost: 100, redeemed: false },
-  { id: 'nyx_3', name: '💧 Liqui Moly DOT 5.1', emoji: '🧪', cost: 60, redeemed: false },
-  { id: 'nyx_4', name: '🖤 Single Seat + Cowl', emoji: '🏍️', cost: 120, redeemed: false },
-  { id: 'nyx_5', name: '🎨 Wine Red Paint / Wrap', emoji: '🎨', cost: 200, redeemed: false },
-  { id: 'nyx_6', name: '🛑 Venta Floating Rotor', emoji: '🛑', cost: 140, redeemed: false },
-  { id: 'nyx_7', name: '⚙️ RCB Brake & Clutch Levers', emoji: '🔧', cost: 110, redeemed: false },
-  { id: 'nyx_8', name: '🔊 Powerage Exhaust', emoji: '🔊', cost: 250, redeemed: false },
-  { id: 'nyx_9', name: '⛰️ Ponmudi Ride / Kerala Weekend Ride', emoji: '🌄', cost: 180, redeemed: false }
+  { id: 'nyx_1', name: '🔥 FuelX Pro / BoosterPlug', emoji: '⚙️', cost: 150, requiredMedals: { bronze: 5, silver: 3, gold: 2, honor: 0 }, redeemed: false },
+  { id: 'nyx_2', name: '🔥 66BHP Teflon Brake Hose', emoji: '🏍️', cost: 100, requiredMedals: { bronze: 3, silver: 2, gold: 0, honor: 0 }, redeemed: false },
+  { id: 'nyx_3', name: '💧 Liqui Moly DOT 5.1', emoji: '🧪', cost: 60, requiredMedals: { bronze: 2, silver: 0, gold: 0, honor: 0 }, redeemed: false },
+  { id: 'nyx_4', name: '🖤 Single Seat + Cowl', emoji: '🏍️', cost: 120, requiredMedals: { bronze: 3, silver: 2, gold: 1, honor: 0 }, redeemed: false },
+  { id: 'nyx_5', name: '🎨 Wine Red Paint / Wrap', emoji: '🎨', cost: 200, requiredMedals: { bronze: 0, silver: 0, gold: 2, honor: 1 }, redeemed: false },
+  { id: 'nyx_6', name: '🛑 Venta Floating Rotor', emoji: '🛑', cost: 140, requiredMedals: { bronze: 0, silver: 3, gold: 1, honor: 0 }, redeemed: false },
+  { id: 'nyx_7', name: '⚙️ RCB Brake & Clutch Levers', emoji: '🔧', cost: 110, requiredMedals: { bronze: 4, silver: 2, gold: 0, honor: 0 }, redeemed: false },
+  { id: 'nyx_8', name: '🔊 Powerage Exhaust', emoji: '🔊', cost: 250, requiredMedals: { bronze: 4, silver: 4, gold: 3, honor: 1 }, redeemed: false },
+  { id: 'nyx_9', name: '⛰️ Ponmudi Ride / Kerala Weekend Ride', emoji: '🌄', cost: 180, requiredMedals: { bronze: 3, silver: 3, gold: 2, honor: 0 }, redeemed: false }
 ];
 
 async function seed() {
@@ -39,6 +39,8 @@ async function seed() {
     let user = await User.findOne({ email: 'agnives46@gmail.com' });
     const hash = await bcrypt.hash('AsM123456', 10);
 
+    const asmMedals = { bronze: 3, silver: 2, gold: 1, honor: 0 };
+
     if (!user) {
       user = new User({
         username: 'AsM',
@@ -46,12 +48,14 @@ async function seed() {
         displayName: 'AsM',
         passwordHash: hash,
         rewards: asmRewards,
+        medals: asmMedals,
         coins: 100
       });
       await user.save();
       console.log('Created new user for AsM (agnives46@gmail.com)');
     } else {
       user.rewards = asmRewards;
+      user.medals = asmMedals;
       user.coins = 100;
       await user.save();
       console.log('Updated existing user for AsM');

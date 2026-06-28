@@ -62,6 +62,9 @@ const ACHIEVEMENT_DEFS = {
   'perfect_week':  { label: 'Perfect Week',   emoji: '🌟',  desc: 'All habits checked for 7 consecutive days' },
   'perfect_month': { label: 'Perfect Month',  emoji: '👑',  desc: '100 % completion for the month' },
   'iron_will':     { label: 'Iron Will',      emoji: '🏋️', desc: '30-day streak on a hard habit' },
+  'early_bird':    { label: 'The Early Bird', emoji: '🌅',  desc: 'Wake up / morning habit done for 15+ days' },
+  'the_machine':   { label: 'The Machine',    emoji: '🤖',  desc: 'Complete 100+ total habits' },
+  'the_comeback':  { label: 'The Comeback',   emoji: '🔥',  desc: 'Maintain a 10-day streak after missing entries' },
   'shopaholic':    { label: 'Shopaholic',      emoji: '🛒',  desc: '5+ rewards redeemed' },
 };
 
@@ -81,6 +84,7 @@ let STATE = {
   darkMode:     false,
   soundEnabled: true,
   coins:        0,
+  medals:       { bronze: 0, silver: 0, gold: 0, honor: 0 },
   activeWeekTab: 0,
 };
 
@@ -150,6 +154,7 @@ async function loadState() {
 
     if (data.settings) {
       STATE.coins = data.settings.coins || 0;
+      STATE.medals = data.settings.medals || { bronze: 0, silver: 0, gold: 0, honor: 0 };
       STATE.darkMode = data.settings.darkMode || false;
       STATE.soundEnabled = data.settings.soundEnabled !== false;
       achievements = data.settings.achievements || {};
@@ -162,6 +167,7 @@ async function loadState() {
     if (!achievements || Object.keys(achievements).length === 0) {
       resetAchievements();
     }
+    updateMedalsDisplay();
   } catch (err) {
     console.error('Failed to load data:', err);
     habits = DEFAULT_HABITS.map(h => ({
@@ -197,6 +203,7 @@ const debouncedSaveApi = (function() {
           notes,
           settings: {
             coins: STATE.coins,
+            medals: STATE.medals,
             darkMode: STATE.darkMode,
             soundEnabled: STATE.soundEnabled,
             achievements,
@@ -545,6 +552,18 @@ function toggleCell(habitIndex, dayIndex) {
   const habit = habits[habitIndex];
   if (!habit) return;
 
+  // 48-Hour Lock Validation
+  const now = new Date();
+  const cellDate = new Date(STATE.currentYear, STATE.currentMonth, dayIndex + 1, 23, 59, 59);
+  const diffMs = now.getTime() - cellDate.getTime();
+  const diffHours = diffMs / (1000 * 60 * 60);
+
+  if (diffHours > 48) {
+    showToast('🔒 Locked — Cannot edit habit entries older than 48 hours!', 'error');
+    playSound('uncheck');
+    return;
+  }
+
   const wasChecked = !!habit.checks[dayIndex];
   habit.checks[dayIndex] = !wasChecked;
 
@@ -572,12 +591,24 @@ function toggleCell(habitIndex, dayIndex) {
   updateAchievementsDisplay();
   updateRewardShop();
   updateCoinDisplay();
+  updateMedalsDisplay();
   calculatePrediction();
 }
 
 function updateCoinDisplay() {
   const el = $('#coin-count');
   if (el) el.textContent = STATE.coins;
+}
+
+function updateMedalsDisplay() {
+  const b = $('#medal-bronze-count');
+  const s = $('#medal-silver-count');
+  const g = $('#medal-gold-count');
+  const h = $('#medal-honor-count');
+  if (b) b.textContent = STATE.medals?.bronze || 0;
+  if (s) s.textContent = STATE.medals?.silver || 0;
+  if (g) g.textContent = STATE.medals?.gold || 0;
+  if (h) h.textContent = STATE.medals?.honor || 0;
 }
 
 /* ─────────────────────────────────────────────
@@ -1232,16 +1263,31 @@ function updateRewardShop() {
   if (grid) {
     grid.innerHTML = '';
     rewards.forEach(r => {
-      const canBuy = shopUnlocked && !r.redeemed && STATE.coins >= r.cost;
+      const reqM = r.requiredMedals || { bronze: 0, silver: 0, gold: 0, honor: 0 };
+      const userM = STATE.medals || { bronze: 0, silver: 0, gold: 0, honor: 0 };
+      const hasMedals = (userM.bronze >= (reqM.bronze||0)) &&
+                        (userM.silver >= (reqM.silver||0)) &&
+                        (userM.gold >= (reqM.gold||0)) &&
+                        (userM.honor >= (reqM.honor||0));
+
+      const canBuy = shopUnlocked && !r.redeemed && STATE.coins >= r.cost && hasMedals;
+      
+      let reqMedalsHTML = '';
+      if (reqM.bronze > 0) reqMedalsHTML += `<span style="font-size:11px;background:rgba(217,119,6,0.2);color:#f59e0b;padding:2px 6px;border-radius:6px;border:1px solid #d97706;">🥉 x${reqM.bronze}</span> `;
+      if (reqM.silver > 0) reqMedalsHTML += `<span style="font-size:11px;background:rgba(148,163,184,0.2);color:#cbd5e1;padding:2px 6px;border-radius:6px;border:1px solid #94a3b8;">🥈 x${reqM.silver}</span> `;
+      if (reqM.gold > 0) reqMedalsHTML += `<span style="font-size:11px;background:rgba(234,179,8,0.2);color:#eab308;padding:2px 6px;border-radius:6px;border:1px solid #eab308;">🥇 x${reqM.gold}</span> `;
+      if (reqM.honor > 0) reqMedalsHTML += `<span style="font-size:11px;background:rgba(168,85,247,0.2);color:#a855f7;padding:2px 6px;border-radius:6px;border:1px solid #a855f7;">🏅 x${reqM.honor}</span> `;
+
       const div = document.createElement('div');
-      div.className = 'reward-item' + (r.redeemed ? ' redeemed' : '') + (!shopUnlocked ? ' locked' : '');
+      div.className = 'reward-item' + (r.redeemed ? ' redeemed' : '') + (!shopUnlocked || !hasMedals ? ' locked' : '');
       div.innerHTML = `
         <span class="reward-emoji">${r.emoji}</span>
         <span class="reward-name">${r.name}</span>
         <span class="reward-cost">🪙 ${r.cost}</span>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin:4px 0;">${reqMedalsHTML}</div>
         ${r.redeemed
           ? '<span class="reward-status">✅ Redeemed</span>'
-          : `<button class="buy-reward-btn" data-id="${r.id}" ${canBuy ? '' : 'disabled'}>${shopUnlocked ? 'Buy' : '🔒'}</button>`
+          : `<button class="buy-reward-btn" data-id="${r.id}" ${canBuy ? '' : 'disabled'}>${!hasMedals ? '🔒 Needs Medals' : shopUnlocked ? 'Claim Trophy' : '🔒 Shop Locked'}</button>`
         }
       `;
       grid.appendChild(div);
@@ -1269,8 +1315,21 @@ function updateRewardShop() {
 function buyReward(rewardId) {
   const reward = rewards.find(r => r.id === rewardId);
   if (!reward || reward.redeemed) return;
-  if (STATE.coins < reward.cost) return;
-  if (getMonthlyCompletion() < 0.75) return;
+  if (STATE.coins < reward.cost) {
+    showToast('🪙 Need more coins to unlock this trophy!', 'error');
+    return;
+  }
+  if (getMonthlyCompletion() < 0.75) {
+    showToast('🔒 Reach 75% monthly completion to unlock the shop!', 'error');
+    return;
+  }
+
+  const reqM = reward.requiredMedals || { bronze: 0, silver: 0, gold: 0, honor: 0 };
+  const userM = STATE.medals || { bronze: 0, silver: 0, gold: 0, honor: 0 };
+  if ((userM.bronze < (reqM.bronze||0)) || (userM.silver < (reqM.silver||0)) || (userM.gold < (reqM.gold||0)) || (userM.honor < (reqM.honor||0))) {
+    showToast('🔒 Trophy Locked — You need more Medals to earn this prestige trophy!', 'error');
+    return;
+  }
 
   STATE.coins -= reward.cost;
   reward.redeemed = true;
@@ -1283,6 +1342,7 @@ function buyReward(rewardId) {
   updateRewardShop();
   checkAchievements();
   updateAchievementsDisplay();
+  showToast(`🏆 Congratulations! You unlocked ${reward.name} guilt-free!`, 'success');
 }
 
 function addReward(name, cost, emoji) {

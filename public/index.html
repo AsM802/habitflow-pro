@@ -26,7 +26,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=17.0">
+  <link rel="stylesheet" href="style.css?v=18.0">
   <style>
     /* GUARANTEED EXECUTIVE POPUP & GLOBAL INPUT OVERRIDES */
     input, textarea, select, #reward-name-input, #reward-cost-input, #reward-emoji-input, #habit-name-input, #habit-goal-input, #notes-textarea, #reflection-notes, #reflection-task-status, #wishlist-title-input, #wishlist-target-input, #exam-name-input, #exam-score-input, #exam-accuracy-input {
@@ -275,6 +275,20 @@
         <div>
           <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px;">Completion Rate</div>
           <div id="summary-completion-pct" style="font-size: 20px; font-weight: 700; color: #10b981;">0%</div>
+        </div>
+      </div>
+
+      <!-- Medals Showcase -->
+      <div class="card" style="padding: 16px 20px; display: flex; align-items: center; gap: 16px;">
+        <div style="font-size: 32px;">🏅</div>
+        <div>
+          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #a5b4fc; letter-spacing: 0.5px;">Earned Medals</div>
+          <div id="summary-medals-display" style="font-size: 14px; font-weight: 800; color: #ffffff; display: flex; gap: 10px; margin-top: 4px;">
+            <span>🥉 <span id="medal-bronze-count">0</span></span>
+            <span>🥈 <span id="medal-silver-count">0</span></span>
+            <span>🥇 <span id="medal-gold-count">0</span></span>
+            <span>🏅 <span id="medal-honor-count">0</span></span>
+          </div>
         </div>
       </div>
 
@@ -701,6 +715,6 @@
        SCRIPTS
   ═══════════════════════════════════════════ -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="app.js?v=17.0"></script>
+  <script src="app.js?v=18.0"></script>
 </body>
 </html>
