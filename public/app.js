@@ -447,7 +447,7 @@ function buildGrid() {
 
   // Row 1: Week group headers
   const weekRow = document.createElement('tr');
-  weekRow.innerHTML = '<th class="corner-cell">Habit</th>';
+  weekRow.innerHTML = '<th class="corner-cell" colspan="3">Habit & Progress</th>';
   for (let w = 0; w < 5; w++) {
     const startDay = w * 7 + 1;
     const endDay   = Math.min((w + 1) * 7, daysInMonth);
@@ -455,23 +455,21 @@ function buildGrid() {
     const span = endDay - startDay + 1;
     weekRow.innerHTML += `<th colspan="${span}" class="week-header">Week ${w + 1}</th>`;
   }
-  weekRow.innerHTML += '<th colspan="2" class="progress-header">Progress</th>';
   thead.appendChild(weekRow);
 
   // Row 2: Day-of-week letters
   const letterRow = document.createElement('tr');
-  letterRow.innerHTML = '<th></th>';
+  letterRow.innerHTML = '<th class="habit-header-name">Habit</th><th class="habit-header-pct">%</th><th class="habit-header-goal">Goal</th>';
   const firstDay = getFirstDayOfMonth(STATE.currentMonth, STATE.currentYear);
   for (let d = 0; d < daysInMonth; d++) {
     const dow = (firstDay + d) % 7; // 0=Mon
     letterRow.innerHTML += `<th class="day-letter">${DAY_LETTERS[dow]}</th>`;
   }
-  letterRow.innerHTML += '<th>%</th><th>Goal</th>';
   thead.appendChild(letterRow);
 
   // Row 3: Day numbers (clickable for notes)
   const numRow = document.createElement('tr');
-  numRow.innerHTML = '<th></th>';
+  numRow.innerHTML = '<th></th><th></th><th></th>';
   const now = new Date();
   const isCurrentMonth = STATE.currentMonth === now.getMonth() && STATE.currentYear === now.getFullYear();
   const todayIndex = now.getDate() - 1;
@@ -481,7 +479,6 @@ function buildGrid() {
     const isToday = isCurrentMonth && d === todayIndex;
     numRow.innerHTML += `<th class="day-number ${hasNote ? 'has-note' : ''} ${isToday ? 'today-column' : ''}" data-day="${d}" title="${hasNote ? 'Has note — click to view' : 'Click to add note'}">${d + 1}</th>`;
   }
-  numRow.innerHTML += '<th></th><th></th>';
   thead.appendChild(numRow);
 
   // --- BODY (habit rows) ---
@@ -501,8 +498,22 @@ function buildGrid() {
     `;
     tr.appendChild(nameTd);
 
-    // Day cells
     const checked = habit.checks || {};
+    const totalChecked = Object.values(checked).filter(Boolean).length;
+    const pct = habit.goal > 0 ? Math.round((totalChecked / habit.goal) * 100) : 0;
+
+    // Progress cells placed immediately next to Habit Name!
+    const pctTd = document.createElement('td');
+    pctTd.className = 'progress-pct sticky-progress-pct';
+    pctTd.textContent = `${Math.min(pct, 100)}%`;
+    tr.appendChild(pctTd);
+
+    const goalTd = document.createElement('td');
+    goalTd.className = 'progress-goal sticky-progress-goal';
+    goalTd.textContent = `${totalChecked}/${habit.goal}`;
+    tr.appendChild(goalTd);
+
+    // Day cells follow after Progress columns
     for (let d = 0; d < daysInMonth; d++) {
       const td = document.createElement('td');
       const wk = getWeekForDay(d);
@@ -513,20 +524,6 @@ function buildGrid() {
       if (checked[d]) td.classList.add('checked');
       tr.appendChild(td);
     }
-
-    // Progress cells
-    const totalChecked = Object.values(checked).filter(Boolean).length;
-    const pct = habit.goal > 0 ? Math.round((totalChecked / habit.goal) * 100) : 0;
-
-    const pctTd = document.createElement('td');
-    pctTd.className = 'progress-pct';
-    pctTd.textContent = `${Math.min(pct, 100)}%`;
-    tr.appendChild(pctTd);
-
-    const goalTd = document.createElement('td');
-    goalTd.className = 'progress-goal';
-    goalTd.textContent = `${totalChecked}/${habit.goal}`;
-    tr.appendChild(goalTd);
 
     tbody.appendChild(tr);
   });

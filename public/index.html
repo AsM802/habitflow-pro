@@ -26,7 +26,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=18.0">
+  <link rel="stylesheet" href="style.css?v=19.0">
   <style>
     /* GUARANTEED EXECUTIVE POPUP & GLOBAL INPUT OVERRIDES */
     input, textarea, select, #reward-name-input, #reward-cost-input, #reward-emoji-input, #habit-name-input, #habit-goal-input, #notes-textarea, #reflection-notes, #reflection-task-status, #wishlist-title-input, #wishlist-target-input, #exam-name-input, #exam-score-input, #exam-accuracy-input {
@@ -208,6 +208,26 @@
     .top-habit-item .rank {
       font-weight: 800 !important;
       color: #6366f1 !important;
+    }
+    /* STICKY PROGRESS COLUMNS DIRECTLY NEXT TO HABIT NAME */
+    .sticky-progress-pct, .habit-header-pct {
+      position: sticky !important;
+      left: 230px !important;
+      z-index: 5 !important;
+      background: #181e36 !important;
+      font-weight: 800 !important;
+      color: #10b981 !important;
+      min-width: 50px !important;
+    }
+    .sticky-progress-goal, .habit-header-goal {
+      position: sticky !important;
+      left: 280px !important;
+      z-index: 5 !important;
+      background: #181e36 !important;
+      font-weight: 700 !important;
+      color: #a5b4fc !important;
+      min-width: 60px !important;
+      border-right: 2px solid #2a3458 !important;
     }
   </style>
 </head>
@@ -715,6 +735,6 @@
        SCRIPTS
   ═══════════════════════════════════════════ -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="app.js?v=18.0"></script>
+  <script src="app.js?v=19.0"></script>
 </body>
 </html>
