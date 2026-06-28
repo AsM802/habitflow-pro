@@ -1863,14 +1863,14 @@ function bindEvents() {
   if (refBtn) refBtn.addEventListener('click', () => openReflectionModal());
 
   const refClose = $('#reflection-modal-close');
-  if (refClose) refClose.addEventListener('click', () => closeModal('reflection-modal-overlay'));
+  if (refClose) refClose.addEventListener('click', () => dismissReflectionModal());
 
   const refCancel = $('#reflection-modal-cancel');
-  if (refCancel) refCancel.addEventListener('click', () => closeModal('reflection-modal-overlay'));
+  if (refCancel) refCancel.addEventListener('click', () => dismissReflectionModal());
 
   const refOverlay = $('#reflection-modal-overlay');
   if (refOverlay) refOverlay.addEventListener('click', e => {
-    if (e.target === refOverlay) closeModal('reflection-modal-overlay');
+    if (e.target === refOverlay) dismissReflectionModal();
   });
 
   const refSave = $('#reflection-modal-save');
@@ -2085,6 +2085,16 @@ function toggleNotifications() {
 
 let selectedReflectionMood = '😊';
 
+function getCurrentWeekKey() {
+  const today = new Date();
+  return `${today.getFullYear()}_M${today.getMonth()}_W${Math.floor(today.getDate() / 7)}`;
+}
+
+function dismissReflectionModal() {
+  localStorage.setItem('last_reflection_week', getCurrentWeekKey());
+  closeModal('reflection-modal-overlay');
+}
+
 function openReflectionModal() {
   openModal('reflection-modal-overlay');
 }
@@ -2102,10 +2112,7 @@ function saveReflection() {
   playSound('achievement');
   triggerConfetti();
 
-  const today = new Date();
-  localStorage.setItem('last_reflection_week', `${today.getFullYear()}_M${today.getMonth()}_W${Math.floor(today.getDate() / 7)}`);
-
-  closeModal('reflection-modal-overlay');
+  dismissReflectionModal();
   showToast(`Reflection saved! You earned +10 coins!`, '🌟');
 }
 
