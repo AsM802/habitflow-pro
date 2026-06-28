@@ -344,17 +344,6 @@ async function init() {
   updateThemeButton();
   updateSoundButton();
 
-  // Auto-open Weekly Check-in reflection popup only on Mondays (1 = Monday), once per week
-  const today = new Date();
-  const isMonday = today.getDay() === 1;
-  const lastReflection = localStorage.getItem('last_reflection_week');
-  const currentWeekKey = `${today.getFullYear()}_M${today.getMonth()}_W${Math.floor(today.getDate() / 7)}`;
-
-  if (isMonday && lastReflection !== currentWeekKey) {
-    setTimeout(() => {
-      openReflectionModal();
-    }, 600);
-  }
 }
 
 function updateUserDisplay() {
@@ -548,22 +537,36 @@ function buildGrid() {
     tbody.appendChild(tr);
   });
 
-  // Auto-scroll grid to today's date if viewing current month and year
-  setTimeout(() => {
-    const now = new Date();
-    if (STATE.currentMonth === now.getMonth() && STATE.currentYear === now.getFullYear()) {
-      const todayNumCell = document.querySelector(`.day-number[data-day="${now.getDate() - 1}"]`);
-      const gridWrapper = document.querySelector('.habit-grid-wrapper');
-      if (todayNumCell && gridWrapper) {
-        const cellLeft = todayNumCell.offsetLeft;
-        const wrapperWidth = gridWrapper.clientWidth;
-        gridWrapper.scrollTo({
-          left: Math.max(0, cellLeft - (wrapperWidth / 2) + 20),
-          behavior: 'smooth'
-        });
-      }
+  // Auto-scroll grid to today's date ONLY on initial load
+  if (!window.hasAutoScrolledGrid) {
+    window.hasAutoScrolledGrid = true;
+    setTimeout(scrollToToday, 150);
+  }
+}
+
+function scrollToDay1() {
+  const gridWrapper = document.querySelector('.habit-grid-wrapper');
+  if (gridWrapper) {
+    gridWrapper.scrollTo({ left: 0, behavior: 'smooth' });
+  }
+}
+
+function scrollToToday() {
+  const now = new Date();
+  if (STATE.currentMonth === now.getMonth() && STATE.currentYear === now.getFullYear()) {
+    const todayNumCell = document.querySelector(`.day-number[data-day="${now.getDate() - 1}"]`);
+    const gridWrapper = document.querySelector('.habit-grid-wrapper');
+    if (todayNumCell && gridWrapper) {
+      const cellLeft = todayNumCell.offsetLeft;
+      const wrapperWidth = gridWrapper.clientWidth;
+      gridWrapper.scrollTo({
+        left: Math.max(0, cellLeft - (wrapperWidth / 2) + 20),
+        behavior: 'smooth'
+      });
     }
-  }, 150);
+  } else {
+    scrollToDay1();
+  }
 }
 
 /* ─────────────────────────────────────────────
@@ -1749,6 +1752,13 @@ function bindEvents() {
       }
     });
   }
+
+  // --- Quick Jump Buttons ---
+  const jumpDay1Btn = $('#jump-day1-btn');
+  if (jumpDay1Btn) jumpDay1Btn.addEventListener('click', scrollToDay1);
+
+  const jumpTodayBtn = $('#jump-today-btn');
+  if (jumpTodayBtn) jumpTodayBtn.addEventListener('click', scrollToToday);
 
   // --- Week tabs ---
   const weekTabsEl = $('#week-tabs');

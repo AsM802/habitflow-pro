@@ -26,7 +26,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=27.0">
+  <link rel="stylesheet" href="style.css?v=28.0">
   <style>
     /* GUARANTEED EXECUTIVE POPUP & GLOBAL INPUT OVERRIDES */
     input, textarea, select, #reward-name-input, #reward-cost-input, #reward-emoji-input, #habit-name-input, #habit-goal-input, #notes-textarea, #reflection-notes, #reflection-task-status, #wishlist-title-input, #wishlist-target-input, #exam-name-input, #exam-score-input, #exam-accuracy-input {
@@ -404,7 +404,13 @@
     ═══════════════════════════════════════════ -->
     <section class="tracker-section card" aria-label="Daily habits tracker grid">
       <div class="tracker-header">
-        <div class="section-label" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">DAILY HABITS</div>
+        <div style="display: flex; gap: 14px; align-items: center;">
+          <div class="section-label" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">DAILY HABITS</div>
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <button id="jump-day1-btn" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">⏪ Day 1</button>
+            <button id="jump-today-btn" style="background: rgba(99, 102, 241, 0.25); color: #a5b4fc; border: 1px solid #6366f1; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">🎯 Today</button>
+          </div>
+        </div>
         <div class="tracker-actions">
           <button class="btn btn-primary add-habit-btn" id="add-habit-btn" aria-label="Add a new habit">+ Add Habit</button>
         </div>
@@ -768,6 +774,6 @@
        SCRIPTS
   ═══════════════════════════════════════════ -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="app.js?v=27.0"></script>
+  <script src="app.js?v=28.0"></script>
 </body>
 </html>
