@@ -96,8 +96,18 @@ let examScores   = [];
 let wishlistItems= [];
 let currentUser  = null;
 
+function getAuthHeaders(extraHeaders = {}) {
+  const headers = { 'Content-Type': 'application/json', ...extraHeaders };
+  const token = localStorage.getItem('auth_token');
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+    headers['x-auth-token'] = token;
+  }
+  return headers;
+}
+
 async function apiGet(url) {
-  const res = await fetch(url);
+  const res = await fetch(url, { headers: getAuthHeaders() });
   if (res.status === 401) {
     window.location.href = '/login.html';
     throw new Error('Not authenticated');
@@ -108,7 +118,7 @@ async function apiGet(url) {
 async function apiPost(url, data) {
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(data),
   });
   if (res.status === 401) {
@@ -117,6 +127,7 @@ async function apiPost(url, data) {
   }
   return res.json();
 }
+
 
 function habitsKey(m, y) { return `habits_${y}_${m}`; }
 function notesKey(m, y)  { return `notes_${y}_${m}`; }

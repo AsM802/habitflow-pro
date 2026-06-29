@@ -42,6 +42,7 @@ router.post('/register', async (req, res) => {
 
     res.json({
       success: true,
+      token,
       user: { id: user._id, username: user.username, email: user.email, displayName: user.displayName }
     });
   } catch (err) {
@@ -78,8 +79,10 @@ router.post('/login', async (req, res) => {
 
     res.json({
       success: true,
+      token,
       user: { id: user._id, username: user.username, email: user.email, displayName: user.displayName }
     });
+
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ error: 'Server error during login: ' + err.message });
