@@ -38,6 +38,10 @@
   -webkit-font-smoothing: antialiased;
 }
 
+canvas {
+  max-width: 100% !important;
+}
+
 body {
   background: var(--bg-app);
   color: var(--text-main);
@@ -832,10 +836,10 @@ input, textarea, select {
     gap: 6px !important;
   }
 
-  /* Summary Stat Bar Override (Override HTML inline grids) */
+  /* Summary Stat Bar Override (Override HTML inline grids to stack cleanly) */
   div[style*="grid-template-columns: repeat(auto-fit"] {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 10px !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
   }
 
   /* Main Tracker Section & Table Wrapper */
