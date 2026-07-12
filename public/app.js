@@ -106,27 +106,40 @@ function getAuthHeaders(extraHeaders = {}) {
   return headers;
 }
 
+function getApiUrl(path) {
+  // Capacitor wraps local assets in 'capacitor://localhost' or 'http://localhost' (no custom port)
+  const isCapacitor = window.location.origin.startsWith('capacitor://') || 
+                      (window.location.origin.startsWith('http://localhost') && !window.location.port);
+  if (isCapacitor) {
+    // Fallback to hosted Vercel deployment URL
+    const HOSTED_URL = 'https://habitflow-pro.vercel.app';
+    return `${HOSTED_URL}${path}`;
+  }
+  return path;
+}
+
 async function apiGet(url) {
-  const res = await fetch(url, { headers: getAuthHeaders() });
+  const res = await fetch(getApiUrl(url), { headers: getAuthHeaders() });
   if (res.status === 401) {
-    window.location.href = '/login.html';
+    window.location.href = 'login.html';
     throw new Error('Not authenticated');
   }
   return res.json();
 }
 
 async function apiPost(url, data) {
-  const res = await fetch(url, {
+  const res = await fetch(getApiUrl(url), {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify(data),
   });
   if (res.status === 401) {
-    window.location.href = '/login.html';
+    window.location.href = 'login.html';
     throw new Error('Not authenticated');
   }
   return res.json();
 }
+
 
 
 function habitsKey(m, y) { return `habits_${y}_${m}`; }
