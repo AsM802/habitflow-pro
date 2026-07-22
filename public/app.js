@@ -259,7 +259,7 @@ const saveApiManager = (function() {
   };
 })();
 
-function saveState(immediate = false) {
+function saveState(immediate = true) {
   if (immediate) {
     saveApiManager.flush();
   } else {
@@ -2579,6 +2579,53 @@ function setRikoDialogue(msg) {
 let isTalking = false;
 let talkTimer = null;
 
+function playRexRadioEffect() {
+  if (!STATE.soundEnabled) return;
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+
+    // 1. High frequency squelch blip (radio link click)
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1200, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.06, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+    
+    // 2. White noise static blast (0.15 seconds)
+    const bufferSize = ctx.sampleRate * 0.15;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 1200;
+    filter.Q.value = 1.8;
+
+    const noiseGain = ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.04, ctx.currentTime);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.1);
+
+    noise.connect(filter);
+    filter.connect(noiseGain);
+    noiseGain.connect(ctx.destination);
+    noise.start();
+  } catch (_) {}
+}
+
 function speakRikoWithLipSync(text) {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
@@ -2588,8 +2635,9 @@ function speakRikoWithLipSync(text) {
   const utterance = new SpeechSynthesisUtterance(cleanText);
 
   if (currentCharacter === 'rex') {
-    utterance.pitch = 0.8;
-    utterance.rate = 1.0;
+    playRexRadioEffect();
+    utterance.pitch = 0.65; // Deep voice
+    utterance.rate = 0.95;
   } else {
     utterance.pitch = 1.25;
     utterance.rate = 1.1;
