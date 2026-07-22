@@ -162,20 +162,6 @@ async function loadState() {
   try {
     const data = await apiGet(`/api/data?month=${STATE.currentMonth}&year=${STATE.currentYear}`);
     
-    if (data.habits && Array.isArray(data.habits) && data.habits.length > 0) {
-      habits = data.habits;
-    } else {
-      habits = DEFAULT_HABITS.map((h) => ({
-        id: generateId(),
-        name: h.name,
-        goal: h.goal,
-        difficulty: h.difficulty,
-        checks: {},
-      }));
-    }
-
-    notes = data.notes || {};
-
     if (data.settings) {
       STATE.coins = data.settings.coins || 0;
       STATE.medals = data.settings.medals || { bronze: 0, silver: 0, gold: 0, honor: 0 };
@@ -183,6 +169,28 @@ async function loadState() {
       STATE.soundEnabled = data.settings.soundEnabled !== false;
       achievements = data.settings.achievements || {};
     }
+
+    if (data.habits && Array.isArray(data.habits) && data.habits.length > 0) {
+      habits = data.habits;
+    } else {
+      // New month or brand new user
+      if (data.settings && data.settings.hasAnyData) {
+        // Carry over existing habits from memory but reset daily checks
+        habits = habits.map((h) => ({
+          id: h.id || generateId(),
+          name: h.name,
+          goal: h.goal,
+          difficulty: h.difficulty,
+          checks: {},
+        }));
+      } else {
+        // Brand new user: clean slate so they can type everything themselves
+        habits = [];
+      }
+    }
+
+    notes = data.notes || {};
+
 
     rewards = data.rewards || [];
     examScores = data.examScores || [];
@@ -2337,20 +2345,24 @@ async function onMonthYearChange() {
     if (data.habits && Array.isArray(data.habits) && data.habits.length > 0) {
       habits = data.habits;
     } else {
-      habits = DEFAULT_HABITS.map(h => ({
-        id: generateId(),
-        name: h.name,
-        goal: h.goal,
-        difficulty: h.difficulty,
-        checks: {},
-      }));
+      // New month or brand new user
+      if (data.settings && data.settings.hasAnyData) {
+        // Carry over existing habits from memory but reset daily checks
+        habits = habits.map((h) => ({
+          id: h.id || generateId(),
+          name: h.name,
+          goal: h.goal,
+          difficulty: h.difficulty,
+          checks: {},
+        }));
+      } else {
+        // Brand new user: clean slate so they can type everything themselves
+        habits = [];
+      }
     }
     notes = data.notes || {};
   } catch (err) {
-    habits = DEFAULT_HABITS.map(h => ({
-      id: generateId(),
-      name: h.name, goal: h.goal, difficulty: h.difficulty, checks: {},
-    }));
+    // Keep current memory state or clear
     notes = {};
   }
 

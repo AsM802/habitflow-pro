@@ -16,6 +16,7 @@ router.get('/data', async (req, res) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     let habitData = await HabitData.findOne({ userId: req.userId, month, year });
+    const hasAnyData = await HabitData.exists({ userId: req.userId });
 
     res.json({
       habits: habitData ? habitData.habits : [],
@@ -27,7 +28,8 @@ router.get('/data', async (req, res) => {
         medals: user.medals || { bronze: 0, silver: 0, gold: 0, honor: 0 },
         darkMode: user.darkMode || false,
         soundEnabled: user.soundEnabled !== false,
-        achievements: user.achievements || {}
+        achievements: user.achievements || {},
+        hasAnyData: !!hasAnyData
       },
       rewards: user.rewards || [],
       examScores: user.examScores || [],
