@@ -46,9 +46,25 @@ html, body {
   box-sizing: border-box !important;
 }
 
-canvas {
+/* Responsive charts scale to parent width */
+#daily-progress-chart, #weekly-area-chart {
   max-width: 100% !important;
   width: 100% !important;
+}
+
+/* Circular donuts and progress rings remain fixed crisp sizes and center-aligned */
+#overall-progress-ring {
+  width: 160px !important;
+  height: 160px !important;
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+#overview-donut {
+  width: 150px !important;
+  height: 150px !important;
+  display: block !important;
+  margin: 0 auto !important;
 }
 
 body {

@@ -890,7 +890,7 @@ function animateRing(canvas, targetPct, color, duration) {
   const start  = -Math.PI / 2;
   let startTime = null;
 
-  const bgColor = STATE.darkMode ? '#333' : GRAY_BG;
+  const bgColor = 'rgba(255, 255, 255, 0.08)';
 
   function frame(ts) {
     if (!startTime) startTime = ts;
@@ -923,8 +923,8 @@ function animateRing(canvas, targetPct, color, duration) {
     }
 
     // Center text
-    ctx.fillStyle = STATE.darkMode ? '#eee' : '#333';
-    ctx.font = 'bold 26px Inter, sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '800 32px Inter, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(`${Math.round(val * 100)}%`, cx, cy);
