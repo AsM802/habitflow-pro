@@ -499,6 +499,82 @@ function updateMonthDisplay() {
    6. GRID BUILDING
    ───────────────────────────────────────────── */
 
+function buildMobileTodayChecklist() {
+  const container = $('#mobile-today-container');
+  const listEl = $('#mobile-today-list');
+  if (!container || !listEl) return;
+
+  const isMobile = window.innerWidth <= 768;
+  if (!isMobile) {
+    container.style.display = 'none';
+    return;
+  }
+
+  container.style.display = 'block';
+  listEl.innerHTML = '';
+
+  const now = new Date();
+  const isCurrentMonth = STATE.currentMonth === now.getMonth() && STATE.currentYear === now.getFullYear();
+  
+  if (!isCurrentMonth) {
+    listEl.innerHTML = `<div style="font-size: 13px; color: var(--text-muted); text-align: center; padding: 12px; background: #181e36; border: 1px dashed var(--border); border-radius: 12px;">Checklist is only available for the current active month.</div>`;
+    return;
+  }
+
+  const todayIndex = now.getDate() - 1;
+
+  if (!habits || habits.length === 0) {
+    listEl.innerHTML = `<div style="font-size: 13px; color: var(--text-muted); text-align: center; padding: 16px; background: #181e36; border: 1px dashed var(--border); border-radius: 12px;">No habits added yet. Click "+ Add Habit" to start!</div>`;
+    return;
+  }
+
+  habits.forEach((habit, hi) => {
+    const isChecked = !!(habit.checks && habit.checks[todayIndex]);
+    const coinDelta = DIFFICULTY_COINS[habit.difficulty] || 1;
+
+    const row = document.createElement('div');
+    row.className = 'mobile-checklist-row';
+    row.style.display = 'flex';
+    row.style.alignItems = 'center';
+    row.style.justifyContent = 'space-between';
+    row.style.background = isChecked ? 'rgba(16, 185, 129, 0.08)' : '#181e36';
+    row.style.border = isChecked ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid #2a3458';
+    row.style.padding = '12px 16px';
+    row.style.borderRadius = '12px';
+    row.style.transition = 'all 0.2s ease';
+    row.style.marginBottom = '8px';
+
+    row.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 14px; flex: 1;">
+        <button class="mobile-check-btn ${isChecked ? 'checked' : ''}" data-index="${hi}" style="
+          width: 44px; height: 44px; min-width: 44px; border-radius: 10px; border: 2px solid ${isChecked ? 'var(--success)' : '#4b5563'};
+          background: ${isChecked ? 'var(--success)' : 'transparent'};
+          color: #ffffff; font-size: 20px; font-weight: 900;
+          cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        ">${isChecked ? '✓' : ''}</button>
+        <div style="display: flex; flex-direction: column;">
+          <span style="font-size: 14px; font-weight: 700; color: #ffffff; text-decoration: ${isChecked ? 'line-through' : 'none'}; opacity: ${isChecked ? 0.6 : 1};">${habit.name}</span>
+          <span style="font-size: 11px; font-weight: 700; color: var(--accent-light); margin-top: 2px;">
+            ${habit.difficulty.toUpperCase()} • Streak: ${Object.values(habit.checks || {}).filter(Boolean).length}/${habit.goal} days
+          </span>
+        </div>
+      </div>
+      <div style="font-size: 12px; font-weight: 800; color: #f59e0b; background: rgba(245, 158, 11, 0.15); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.3);">
+        +${coinDelta}🪙
+      </div>
+    `;
+
+    // Click handler for toggle checkbox
+    const checkBtn = row.querySelector('.mobile-check-btn');
+    checkBtn.addEventListener('click', () => {
+      toggleCell(hi, todayIndex);
+      buildMobileTodayChecklist(); // sync checkbox status in checklist view
+    });
+
+    listEl.appendChild(row);
+  });
+}
+
 function buildGrid() {
   const thead = $('#grid-thead');
   const tbody = $('#grid-tbody');
@@ -2016,9 +2092,10 @@ function bindEvents() {
     });
   }
 
-  // --- Window resize → redraw charts (debounced) ---
+  // --- Window resize → redraw charts & mobile checklist (debounced) ---
   window.addEventListener('resize', debounce(() => {
     drawAllCharts();
+    buildMobileTodayChecklist();
   }, 300));
 }
 
@@ -2372,6 +2449,7 @@ async function onMonthYearChange() {
 
 function refreshAll() {
   buildGrid();
+  buildMobileTodayChecklist();
   buildWeekTabs();
   drawAllCharts();
   updateProgressTable();
