@@ -658,7 +658,8 @@ function buildGrid() {
       const td = document.createElement('td');
       const wk = getWeekForDay(d);
       const isToday = isCurrentMonth && d === todayIndex;
-      td.className = `habit-cell week-${wk + 1} ${isToday ? 'today-column' : ''}`;
+      const isFuture = isFutureMonth || (isCurrentMonth && d > todayIndex);
+      td.className = `habit-cell week-${wk + 1} ${isToday ? 'today-column' : ''} ${isFuture ? 'future-locked-cell' : ''}`;
       td.dataset.habit = hi;
       td.dataset.day   = d;
       if (checked[d]) td.classList.add('checked');
@@ -716,6 +717,18 @@ function toggleCell(habitIndex, dayIndex) {
 
   if (diffHours > 48) {
     showToast('🔒 Locked — Cannot edit habit entries older than 48 hours!', 'error');
+    playSound('uncheck');
+    return;
+  }
+
+  // Future Day Lock Validation (Only unlock after 12:00 AM on that day)
+  const isCurrentMonth = STATE.currentMonth === now.getMonth() && STATE.currentYear === now.getFullYear();
+  const isFutureMonth = (STATE.currentYear > now.getFullYear()) || 
+                        (STATE.currentYear === now.getFullYear() && STATE.currentMonth > now.getMonth());
+  const todayIndex = now.getDate() - 1;
+
+  if (isFutureMonth || (isCurrentMonth && dayIndex > todayIndex)) {
+    showToast('🔒 Locked — You cannot check off habits for future days!', 'error');
     playSound('uncheck');
     return;
   }

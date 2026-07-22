@@ -1070,6 +1070,20 @@ input, textarea, select {
   }
 }
 
+/* Future Locked Days Visual Styles */
+.future-locked-cell {
+  background: rgba(255, 255, 255, 0.015) !important;
+  cursor: not-allowed !important;
+  opacity: 0.35 !important;
+}
+
+.future-locked-cell:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+
+
 
 
 
